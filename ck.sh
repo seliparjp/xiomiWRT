@@ -2886,13 +2886,13 @@ function CheckV4() {
            echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
            echo -e "\E[40;1;37m|                  • CEK DNS •                   |\E[0m"
           echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-           echo -e " ${Font_SkyBlue}** Your network is 12: ${local_isp4}${Font_Suffix} "
-            check4=$(ping 1.1.1.1 -c 1 2>&1)
+           echo -e " ${Font_SkyBlue}** Your network is 12: ${local_isp4}${Font_Suffix} " >/dev/null 2>&1
+            check4=$(ping 1.1.1.1 -c 1 2>&1) >/dev/null 2>&1
             if [[ "$check4" != *"unreachable"* ]] && [[ "$check4" != *"Unreachable"* ]]; then
-                isv4=1
+                isv4=1 >/dev/null 2>&1
             else
-                echo -e "${Font_SkyBlue}???????IPv4,??...${Font_Suffix}"
-                isv4=0
+                echo -e "${Font_SkyBlue}???????IPv4,??...${Font_Suffix}" >/dev/null 2>&1
+                isv4=0 >/dev/null 2>&1
             fi
             echo ""
         fi
