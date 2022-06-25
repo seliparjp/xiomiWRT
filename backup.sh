@@ -36,179 +36,98 @@ exit 0
 fi
 clear
 
-backup_data() {
-    green='\e[0;32m'
-    NC='\e[0m'
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e "\E[40;1;37m|                • BACKUP DATA •                 |\E[0m"
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e "\n[ ${green}INFO${NC} ] Create password for database"
-    read -rp "[ INFO ] Enter password : " -e InputPass
-    sleep 1
-    if [[ -z $InputPass ]]; then
-        menu
-    fi
-    echo -e "[ ${green}INFO${NC} ] Processing... "
-    mkdir -p /root/backup
-    sleep 1
 
-    cp /etc/passwd backup/
-    cp /etc/group backup/
-    cp /etc/shadow backup/
-    cp /etc/gshadow backup/
-    cp /etc/samvpn/xray/user.txt backup/
-    cp -r /etc/samvpn/xray/conf backup/conf
-
-    cd /root
-    zip -rP $InputPass $Name.zip backup >/dev/null 2>&1
-
-    ##############++++++++++++++++++++++++#############
-    LLatest=$(date)
-    Get_Data() {
-        git clone https://github.com/syfqsamvpn/user-backup-db.git /root/user-backup/ &>/dev/null
-    }
-
-    Mkdir_Data() {
-        mkdir -p /root/user-backup/$Name
-    }
-
-    Input_Data_Append() {
-        if [ ! -f "/root/user-backup/$Name/$Name-last-backup" ]; then
-            touch /root/user-backup/$Name/$Name-last-backup
-        fi
-        echo -e "User         : $Name
-last-backup : $LLatest
-" >>/root/user-backup/$Name/$Name-last-backup
-        mv /root/$Name.zip /root/user-backup/$Name/
-    }
-
-    Save_And_Exit() {
-        cd /root/user-backup
-        git config --global user.email "syfqpubg5@gmail.com" &>/dev/null
-        git config --global user.name "syfqsamvpn" &>/dev/null
-        rm -rf .git &>/dev/null
-        git init &>/dev/null
-        git add . &>/dev/null
-        git commit -m m &>/dev/null
-        git branch -M main &>/dev/null
-        git remote add origin https://github.com/syfqsamvpn/user-backup-db
-        git push -f https://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@github.com/syfqsamvpn/user-backup-db.git &>/dev/null
-    }
-
-    if [ ! -d "/root/user-backup/" ]; then
-        sleep 1
-        echo -e "[ ${green}INFO${NC} ] Getting database... "
-        Get_Data
-        Mkdir_Data
-        sleep 1
-        echo -e "[ ${green}INFO${NC} ] Getting info server... "
-        Input_Data_Append
-        sleep 1
-        echo -e "[ ${green}INFO${NC} ] Processing updating server...... "
-        Save_And_Exit
-    fi
-    link="https://raw.githubusercontent.com/syfqsamvpn/user-backup-db/main/$Name/$Name.zip"
-    sleep 1
-    echo -e "[ ${green}INFO${NC} ] Backup done "
-    sleep 1
-    echo
-    sleep 1
-    echo -e "[ ${green}INFO${NC} ] Generete Link Backup "
-    echo
-    sleep 2
-    echo -e "The following is a link to your vps data backup file.
-Your VPS IP $IP
-$link
-save the link pliss!
-If you want to restore data, please enter the link above.
-Thank You For Using Our Services"
-
-    rm -rf /root/backup &>/dev/null
-    rm -rf /root/user-backup &>/dev/null
-    rm -f /root/$Name.zip &>/dev/null
-    echo
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e ""
-    read -n 1 -s -r -p "Press any key to back on menu"
-    menu
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "\E[40;1;37m|            • CERT / RENEW DOMAIN •             |\E[0m"
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo -e "" 
+echo -e "[ ${green}INFO${NC} ] Start " 
+sleep 0.5
+domain=$(cat /etc/samvpn/xray/domain)
+echo -e "[ ${green}INFO${NC} ] Starting renew cert... " 
+sleep 3
+sudo pkill -f nginx &
+wait $!
+systemctl stop nginx
+systemctl stop xray.service
+systemctl stop xray@n
+sleep 2
+/root/.acme.sh/acme.sh --issue -d $domain --standalone -k ec-256 --server letsencrypt >>/etc/samvpn/tls/$domain.log
+~/.acme.sh/acme.sh --installcert -d $domain --fullchainpath /etc/samvpn/xray/xray.crt --keypath /etc/samvpn/xray/xray.key --ecc
+cat /etc/samvpn/tls/$domain.log
+systemctl daemon-reload
+systemctl restart xray@n
+systemctl restart xray.service
+systemctl stop nginx
+rm /etc/nginx/conf.d/xasdhxzasd.conf
+touch /etc/nginx/conf.d/xasdhxzasd.conf
+cat <<EOF >>/etc/nginx/conf.d/xasdhxzasd.conf
+server {
+	listen 81;
+	listen [::]:81;
+	server_name ${domain};
+	# shellcheck disable=SC2154
+	return 301 https://${domain};
 }
-
-restore_data() {
-    green='\e[0;32m'
-    NC='\e[0m'
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e "\E[40;1;37m|               • RESTORE DATA •                 |\E[0m"
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    read -p "Link : " link
-    read -p "Pass : " InputPass
-    mkdir /root/backup
-    wget -q -O /root/backup/backup.zip "$link" &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Getting your data..."
-    unzip -P $InputPass /root/backup/backup.zip &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Starting to restore data..."
-    rm -f /root/backup/backup.zip &>/dev/null
-    sleep 1
-    cd /root/backup
-    echo -e "[ ${green}INFO${NC} ] • Restoring passwd data..."
-    sleep 1
-    cp /root/backup/passwd /etc/ &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Restoring group data..."
-    sleep 1
-    cp /root/backup/group /etc/ &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Restoring shadow data..."
-    sleep 1
-    cp /root/backup/shadow /etc/ &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Restoring gshadow data..."
-    sleep 1
-    cp /root/backup/gshadow /etc/ &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Restoring Xray data..."
-    sleep 1
-    cp /root/backup/user.txt /etc/samvpn/xray/ &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Restoring admin data..."
-    sleep 1
-    cp -r /root/backup/conf /etc/samvpn/xray &>/dev/null
-    rm -rf /root/backup &>/dev/null
-    echo -e "[ ${green}INFO${NC} ] • Done..."
-    sleep 1
-    rm -f /root/backup/backup.zip &>/dev/null
-    systemctl restart xray.service
-    systemctl restart xray@n
-    systemctl restart xray.service
-    echo
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    eco -e ""
-    read -n 1 -s -r -p "Press any key to back on menu"
-    menu
+server {
+		listen 127.0.0.1:31300;
+		server_name _;
+		return 403;
 }
-
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e "\E[40;1;37m|             • BACKUP & RESTORE •               |\E[0m"
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo -e " [\e[36m01\e[0m] Backup Data"
-    echo -e " [\e[36m02\e[0m] Restore Data"
-    echo -e ""
-    echo -e "\n[00] • Back to Main Menu \033[1;32m<\033[1;33m<\033[1;31m<\033[1;31m"
-    echo ""
-    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
-    echo ""
-    read -p " Select menu : " opt
-    echo -e ""
-    case $opt in
-    1 | 01)
-    clear
-    restore_data
-    ;;
-    2 | 02)
-    clear
-    backup_data
-    ;;
-    00)
-    clear
-    menu
-    ;;
-    x) exit ;;
-    *)
-    clear
-    backup
-    ;;
-esac
+server {
+	listen 127.0.0.1:31302 http2;
+	server_name ${domain};
+	root /usr/share/nginx/html;
+	location /s/ {
+    		add_header Content-Type text/plain;
+    		alias /etc/samvpn/config-url/;
+    }
+    location /xraygrpc {
+		client_max_body_size 0;
+#		keepalive_time 1071906480m;
+		keepalive_requests 4294967296;
+		client_body_timeout 1071906480m;
+ 		send_timeout 1071906480m;
+ 		lingering_close always;
+ 		grpc_read_timeout 1071906480m;
+ 		grpc_send_timeout 1071906480m;
+		grpc_pass grpc://127.0.0.1:31301;
+	}
+	location /xraytrojangrpc {
+		client_max_body_size 0;
+		# keepalive_time 1071906480m;
+		keepalive_requests 4294967296;
+		client_body_timeout 1071906480m;
+ 		send_timeout 1071906480m;
+ 		lingering_close always;
+ 		grpc_read_timeout 1071906480m;
+ 		grpc_send_timeout 1071906480m;
+		grpc_pass grpc://127.0.0.1:31304;
+	}
+}
+server {
+	listen 127.0.0.1:31300;
+	server_name ${domain};
+	root /usr/share/nginx/html;
+	location /s/ {
+		add_header Content-Type text/plain;
+		alias /etc/samvpn/config-url/;
+	}
+	location / {
+		add_header Strict-Transport-Security "max-age=15552000; preload" always;
+	}
+}
+EOF
+    systemctl daemon-reload
+    service nginx restart
+    
+echo -e "[ ${green}INFO${NC} ] Renew cert done... " 
+sleep 2
+echo -e "[ ${green}INFO${NC} ] Starting service $Cek " 
+sleep 2
+echo -e "[ ${green}INFO${NC} ] All finished... " 
+sleep 0.5
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+echo ""
+read -n 1 -s -r -p "Press any key to back on menu"
+menu
