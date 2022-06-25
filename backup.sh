@@ -36,7 +36,7 @@ exit 0
 fi
 clear
 
-
+domain_rcer() {
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
 echo -e "\E[40;1;37m|            • CERT / RENEW DOMAIN •             |\E[0m"
 echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
@@ -131,3 +131,36 @@ echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━�
 echo ""
 read -n 1 -s -r -p "Press any key to back on menu"
 menu
+}
+
+echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+    echo -e "\E[40;1;37m|             • DOMAIN PANEL •               |\E[0m"
+    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+    echo -e " [\e[36m01\e[0m] Change Domain"
+    echo -e " [\e[36m02\e[0m] Renew cert"
+    echo -e ""
+    echo -e "\n[00] • Back to Main Menu \033[1;32m<\033[1;33m<\033[1;31m<\033[1;31m"
+    echo ""
+    echo -e "\033[0;34m━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━\033[0m"
+    echo ""
+    read -p " Select menu : " opt
+    echo -e ""
+    case $opt in
+    1 | 01)
+    clear
+    new_domain
+    ;;
+    2 | 02)
+    clear
+    domain_rcer
+    ;;
+    00)
+    clear
+    menu
+    ;;
+    x) exit ;;
+    *)
+    clear
+    backup
+    ;;
+esac
