@@ -1,3 +1,3 @@
 <pre><code>
-wget -q -O /usr/bin/bbt "https://raw.githubusercontent.com/seliparjp/xiomiWRT/main/bbt.sh" && chmod +x /usr/bin/bbt
+wget -q -O /usr/bin/status "https://raw.githubusercontent.com/seliparjp/update/main/status.sh" && chmod +x /usr/bin/status
 </code></pre>
